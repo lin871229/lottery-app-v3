@@ -116,7 +116,14 @@ if uploaded_file:
 
         # 顯示選擇的歷史紀錄
         if selected_history:
+            # 顯示詳細結果
+            selected_record = next(
+                record for record in st.session_state.respites_history + st.session_state.shortterms_history
+                if f"{record['單位名稱']} - {record['抽籤欄位']} (區域：{record['抽籤區域']}) (時間：{record['抽選時間']})" == selected_history
+            )
+
             st.write(f"選擇的抽籤結果：{selected_history}")
+            st.dataframe(pd.DataFrame([selected_record]))  # 顯示該條歷史紀錄
 
 else:
     st.info("請先上傳 Excel 檔案。")
