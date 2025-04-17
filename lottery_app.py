@@ -107,22 +107,26 @@ if uploaded_file:
     if st.session_state.respites_history or st.session_state.shortterms_history:
         st.subheader("歷史抽籤結果")
 
-        # 將歷史紀錄顯示為下拉選單
-        history_options = []
-        for record in st.session_state.respites_history + st.session_state.shortterms_history:
-            history_options.append(f"{record['單位名稱']} - {record['抽籤欄位']} (區域：{record['抽籤區域']}) (時間：{record['抽選時間']})")
+        # 合併所有歷史紀錄
+        all_history = st.session_state.respites_history + st.session_state.shortterms_history
         
-        selected_history = st.selectbox("請選擇歷史抽籤結果", history_options)
+        # 顯示表格
+        history_df = pd.DataFrame(all_history)
+        if not history_df.empty:
+            st.dataframe(history_df)
 
-        # 顯示選擇的歷史紀錄
+        # 顯示下拉選單來選擇具體的歷史紀錄
+        selected_history = st.selectbox(
+            "請選擇歷史抽籤結果", 
+            [f"{record['單位名稱']} - {record['抽籤欄位']} (區域：{record['抽籤區域']}) (時間：{record['抽選時間']})" for record in all_history]
+        )
+
+        # 顯示選中的具體抽籤結果
         if selected_history:
-            # 顯示該選中的紀錄
             selected_record = next(
-                record for record in st.session_state.respites_history + st.session_state.shortterms_history
+                record for record in all_history
                 if f"{record['單位名稱']} - {record['抽籤欄位']} (區域：{record['抽籤區域']}) (時間：{record['抽選時間']})" == selected_history
             )
-
-            # 顯示表格區分清楚的紀錄
             st.write(f"選擇的抽籤結果：{selected_history}")
             st.dataframe(pd.DataFrame([selected_record]))  # 顯示該條歷史紀錄
 
